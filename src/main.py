@@ -2,7 +2,7 @@ from google.cloud import bigquery
 import os
 import requests
 
-PROJECT_ID = os.environ.get("PROJECT_ID", "jkwng-gae-flex3")
+PROJECT_ID = os.environ.get("PROJECT_ID")
 SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL")
 THRESHOLD = os.environ.get("THRESHOLD", )
 client = bigquery.Client(project=PROJECT_ID)
