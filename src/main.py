@@ -1,7 +1,9 @@
 from google.cloud import bigquery
 import os
+import requests
 
 PROJECT_ID = os.environ.get("PROJECT_ID", "jkwng-gae-flex3")
+SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL")
 THRESHOLD = os.environ.get("THRESHOLD", )
 client = bigquery.Client(project=PROJECT_ID)
 
@@ -19,6 +21,14 @@ WHERE
 
 
 def send_alert(cost):
+    message = f"Alert: Your bigquery spend on project ${PROJECT_ID} has surpassed the threshold value of ${THRESHOLD} dollars. Most recent total cost is ${cost} dollars"
+    slack_body = {"text": message}
+    requests.post(
+        slack_webhook_url,
+        headers = ["Content-Type": "application/json"],
+        data = json.dumps(slack_body)
+    )
+    return True
 
 
 
@@ -28,14 +38,17 @@ def main(request):
     query_job = client.query(query)
     rows = query_job.result()
     
-
     for row in rows: 
         # There should be only one resulting row in the above query
         total_cost = row["costInDollars"]
 
     total_cost = float(total_cost)
     if total_cost > THRESHOLD:
-        send_alert(total_cost)
+        try:
+            send_alert(total_cost)
+        except Exception as err:
+            print("Slack notification failed")
+            print(err)
 
 
 

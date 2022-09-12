@@ -38,6 +38,8 @@ resource "google_cloudfunctions_function" "function" {
 
   environment_variables = {
     PROJECT_ID = var.project,
+    SLACK_WEBHOOK_URL = var.SLACK_WEBHOOK_URL
+    THRESHOLD = var.THRESHOLD
   }
 
   available_memory_mb   = 128
