@@ -1,7 +1,8 @@
 from google.cloud import bigquery
 import os
 
-PROJECT_ID = os.environ.get("PROJECT_ID")
+PROJECT_ID = os.environ.get("PROJECT_ID", "jkwng-gae-flex3")
+THRESHOLD = os.environ.get("THRESHOLD", )
 client = bigquery.Client(project=PROJECT_ID)
 
 query = """
@@ -15,6 +16,13 @@ WHERE
   AND job_type = "QUERY"
     """
 
+
+
+def send_alert(cost):
+
+
+
+
 def main(request):
     print("running query")
     query_job = client.query(query)
@@ -24,6 +32,11 @@ def main(request):
     for row in rows: 
         # There should be only one resulting row in the above query
         total_cost = row["costInDollars"]
+
+    total_cost = float(total_cost)
+    if total_cost > THRESHOLD:
+        send_alert(total_cost)
+
 
 
     print("costInDollars: ", total_cost)
