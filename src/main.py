@@ -21,7 +21,11 @@ WHERE
 
 
 def send_alert(cost):
-    message = f"Alert: Your bigquery spend on project ${PROJECT_ID} has surpassed the threshold value of ${THRESHOLD} dollars. Most recent total cost is ${cost} dollars"
+    message = ( 
+        f"Alert: Your bigquery spend on project ${PROJECT_ID} has surpassed"
+        f"the threshold value of ${THRESHOLD} dollars."
+        f"Most recent total cost is ${cost} dollars"
+    )
     slack_body = {"text": message}
     requests.post(
         slack_webhook_url,
