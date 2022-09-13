@@ -1,4 +1,5 @@
 from google.cloud import bigquery
+import json
 import os
 import requests
 
@@ -22,14 +23,14 @@ WHERE
 
 def send_alert(cost):
     message = ( 
-        f"Alert: Your bigquery spend on project ${PROJECT_ID} has surpassed"
-        f"the threshold value of ${THRESHOLD} dollars."
-        f"Most recent total cost is ${cost} dollars"
+        f"Alert: Your bigquery spend on project `{PROJECT_ID}` has surpassed "
+        f"the threshold value of *{THRESHOLD}* dollars."
+        f"Most recent total cost is `{cost}` dollars"
     )
     slack_body = {"text": message}
     requests.post(
-        slack_webhook_url,
-        headers = ["Content-Type": "application/json"],
+        SLACK_WEBHOOK_URL,
+        headers = {"Content-Type": "application/json"},
         data = json.dumps(slack_body)
     )
     return True
@@ -47,7 +48,8 @@ def main(request):
         total_cost = row["costInDollars"]
 
     total_cost = float(total_cost)
-    if total_cost > THRESHOLD:
+    threshold = float(THRESHOLD)
+    if total_cost > threshold:
         try:
             send_alert(total_cost)
         except Exception as err:

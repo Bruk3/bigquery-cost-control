@@ -10,11 +10,15 @@ data "archive_file" "src" {
   output_path = "${path.root}/../generated/src.zip"
 }
 
+# Create a cloud storage bucket for source code to be stored in
 resource "google_storage_bucket" "bucket" {
   name = "cost-control-cloud-function" # This bucket name must be unique
+  location = "US"
+  uniform_bucket_level_access = true
 
 }
 
+# create an archive of the source code and store in bucket
 resource "google_storage_bucket_object" "archive" {
   name   = "${data.archive_file.src.output_md5}.zip"
   bucket = google_storage_bucket.bucket.name
@@ -28,6 +32,19 @@ resource "google_project_service" "cf" {
 
   disable_dependent_services = true
   disable_on_destroy         = false
+}
+
+# Create service account for cloud functions
+resource "google_service_account" "sa_bq_user" {
+    account_id = "bq-job-creator"
+    display_name = "BigQuery Job User Service Account"
+}
+
+# Give service account the bigquery.admin role so that it can have permissions to run queries in BigQuery
+resource "google_project_iam_member" "bigquery_admin" {
+  project = var.project
+  role    = "roles/bigquery.admin" # TODO - does not follow minimal permissions best practice
+  member  = "serviceAccount:${google_service_account.sa_bq_user.email}"
 }
 
 # TODO - Require https and have more fine-grained IAM permissions to restrict invokers 
@@ -47,22 +64,27 @@ resource "google_cloudfunctions_function" "function" {
   source_archive_object = google_storage_bucket_object.archive.name
   trigger_http          = true
   entry_point           = "main" 
-
-
-# Create IAM entry so all users can invoke the function
-resource "google_cloudfunctions_function_iam_member" "invoker" {
-  project        = google_cloudfunctions_function.function.project
-  region         = google_cloudfunctions_function.function.region
-  cloud_function = google_cloudfunctions_function.function.name
-
-  role   = "roles/cloudfunctions.invoker"
-  member = "allUsers"
+  service_account_email = "${google_service_account.sa_bq_user.email}"
 }
 
+
+# # Create IAM entry so all users can invoke the function
+# # TODO - Minimal permissions best practice
+# resource "google_cloudfunctions_function_iam_member" "invoker" {
+#   project        = google_cloudfunctions_function.function.project
+#   region         = google_cloudfunctions_function.function.region
+#   cloud_function = google_cloudfunctions_function.function.name
+
+#   role   = "roles/cloudfunctions.invoker"
+#   member = "allUsers"
+# }
+
+# Create a service account for invoking the cloud function via the cloud scheduler
 resource "google_service_account" "service_account" {
   account_id   = "cloud-function-invoker"
   display_name = "Cloud Function Tutorial Invoker Service Account"
 }
+
 
 resource "google_cloudfunctions_function_iam_member" "invoker" {
   project        = google_cloudfunctions_function.function.project
