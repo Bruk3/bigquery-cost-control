@@ -8,6 +8,7 @@ The terraform script specifies a configuration for Cloud Scheduler to invoke the
 
 
 ### Environment variables:
-- PROJECT_ID
+- project
+- region
 - SLACK_WEBHOOK_URL
 - THRESHOLD  # The minimum value in dollars that the daily spend needs to surpass for an alert to be triggered.
