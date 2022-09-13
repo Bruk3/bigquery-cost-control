@@ -23,8 +23,9 @@ WHERE
 
 def send_alert(cost):
     message = ( 
-        f"Alert: Your bigquery spend on project `{PROJECT_ID}` has surpassed "
-        f"the threshold value of *{THRESHOLD}* dollars."
+        f"@here "
+        f"**ALERT** Your bigquery spend on project `{PROJECT_ID}` has surpassed "
+        f"the threshold value of `{THRESHOLD}` dollars. "
         f"Most recent total cost is `{cost}` dollars"
     )
     slack_body = {"text": message}
