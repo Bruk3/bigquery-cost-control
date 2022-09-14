@@ -67,18 +67,6 @@ resource "google_cloudfunctions_function" "function" {
   service_account_email = "${google_service_account.sa_bq_user.email}"
 }
 
-
-# # Create IAM entry so all users can invoke the function
-# # TODO - Minimal permissions best practice
-# resource "google_cloudfunctions_function_iam_member" "invoker" {
-#   project        = google_cloudfunctions_function.function.project
-#   region         = google_cloudfunctions_function.function.region
-#   cloud_function = google_cloudfunctions_function.function.name
-
-#   role   = "roles/cloudfunctions.invoker"
-#   member = "allUsers"
-# }
-
 # Create a service account for invoking the cloud function via the cloud scheduler
 resource "google_service_account" "service_account" {
   account_id   = "cloud-function-invoker"
