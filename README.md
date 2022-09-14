@@ -11,4 +11,16 @@ The terraform script specifies a configuration for Cloud Scheduler to invoke the
 - project
 - region
 - SLACK_WEBHOOK_URL
-- THRESHOLD  # The minimum value in dollars that the daily spend needs to surpass for an alert to be triggered.
+- THRESHOLD   - _The minimum value in dollars that the daily spend needs to surpass for an alert to be triggered._
+
+You can pass in the environment variables either when running `terraform apply` or have them in a `terraform.tfvars` file in the `terraform/` directory. The environment variables will be populated from the `terraform.tfvars` file.  
+
+## Setup Instructions
+
+1. Clone the repository
+2. Go into the terraform/ directory
+3. Run `terraform init`
+4. Run `terraform plan` to look at the execution plan
+5. Run `terraform apply` to spin up the infrastructure
+
+__Note__ You can run `terraform destroy` to delete all the resources created by the terraform configuration. 
